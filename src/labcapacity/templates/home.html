@@ -1,4 +1,86 @@
 {% extends "layout.html" %}
 {% block content %}
     <h1>Dashboard goes here</h1>
+
+    <div id="map-Div">
+    	
+    	<!-- Map -->
+
+    </div>
+
 {% endblock content %}
+
+{% block script %}
+
+<script type="text/javascript">
+
+	window.onload = function() {
+		var data = [{
+		    type: 'scattergeo',
+		    mode: 'markers+text',
+		    text: [
+		        'Lab1', 'Lab2', 'Lab3'
+		    ],
+		    lon: [
+		        -84.55, -83.74, -83.14
+		    ],
+		    lat: [
+		        42.73, 42.28, 42.60
+		    ],
+		    marker: {
+		        size: 7,
+		        color: [
+		            '#bebada', '#fdb462', '#fb8072'
+		        ],
+		        line: {
+		            width: 1
+		        }
+		    },
+		    name: '',
+		    textposition: [
+		        'top right', 'top left', 'top center', 'bottom right', 'top right',
+		        'top left', 'bottom right', 'bottom left', 'top right', 'top right'
+		    ],
+		}];
+
+		var layout = {
+			width: 700,
+        	height: 700,
+		    title: 'Michigan Labs',
+		    font: {
+		        family: 'Droid Serif, serif',
+		        size: 12
+		    },
+		    titlefont: {
+		        size: 16
+		    },
+		    geo: {
+		        scope: 'north america',
+		        resolution: 50,
+		        lonaxis: {
+		            'range': [-90, -80]
+		        },
+		        lataxis: {
+		            'range': [40, 48]
+		        },
+		        showrivers: true,
+		        rivercolor: '#fff',
+		        showlakes: true,
+		        lakecolor: '#fff',
+		        showland: true,
+		        landcolor: '#EAEAAE',
+		        countrycolor: '#d3d3d3',
+		        countrywidth: 1.5,
+		        subunitcolor: '#d3d3d3'
+		    }
+		};
+
+		var mapDiv = document.getElementById('map-Div');
+		Plotly.newPlot(mapDiv, data, layout)
+
+	}
+	
+
+</script>
+
+{% endblock %}
