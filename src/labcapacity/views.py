@@ -1,11 +1,25 @@
 from flask import Flask, render_template, url_for,flash,redirect,request
 from labcapacity.forms import RegistrationForm,LoginForm,DataEntryForm
 from labcapacity.models import Users, Labs, Update
-from labcapacity import app, db, bcrypt
+from labcapacity import app, db, bcrypt, geolocator
 from flask_login import login_user, current_user, logout_user, login_required
 
+<<<<<<< 4cf5e4da5d12a417e749abc85fe6a032effc8ec7
 >>>>>>> Add user registration , user authentication and database
+=======
+def get_coord(street,city,state,zipcode):
+    
+    address =street+', '+city +', '+state+''+zipcode
+    
+    location = geolocator.geocode(address,exactly_one=True,country_codes='us')
+    
+    #IF address is not accurate geocode returns nearest accurate address without lat or lon. 
+    # In that case query the lat and long again with accurate address
+    if  not hasattr(location,'latitude'):
+        location = geolocator.geocode(location,exactly_one=True,country_codes='us')
+>>>>>>> Add geocoding for Latitute and Longitude
 
+    return location.latitude , location.longitude
 
 @app.route("/")
 @app.route("/home")
@@ -21,7 +35,15 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed = bcrypt.generate_password_hash(form.password.data).decode('utf-8')#hash password
-        lab = Labs(Name=form.labname.data,Street=form.lab_street.data,City=form.lab_city.data,Zip=form.lab_zip.data,State=form.lab_state.data,Lat=41.40,Long=-75.66)
+
+        street = form.lab_street.data
+        city = form.lab_city.data
+        state = form.lab_state.data
+        zipcode = form.lab_zip.data
+
+        lat,lon=get_coord(street,city,state,zipcode)
+        
+        lab = Labs(Name=form.labname.data,Street=street,City=city,Zip=zipcode,State=state,Lat=lat,Long=lon)
 
         user = Users(Email=form.email.data,Password=hashed,lab=lab)
         db.session.add(user)
