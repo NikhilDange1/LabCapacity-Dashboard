@@ -1,12 +1,8 @@
-from flask import Flask, render_template, url_for,flash,redirect
-<<<<<<< 4cf5e4da5d12a417e749abc85fe6a032effc8ec7
-from labcapacity.forms import RegistrationForm,LoginForm
-from labcapacity import app
-=======
+from flask import Flask, render_template, url_for,flash,redirect,request
 from labcapacity.forms import RegistrationForm,LoginForm,DataEntryForm
 from labcapacity.models import Users, Labs, Update
 from labcapacity import app, db, bcrypt
-from flask_login import login_user, current_user, logout_user
+from flask_login import login_user, current_user, logout_user, login_required
 
 >>>>>>> Add user registration , user authentication and database
 
@@ -50,7 +46,9 @@ def login():
         if user and bcrypt.check_password_hash(user.Password,form.password.data):
             login_user(user,form.remember_me.data)
             flash(f'Logged in as {form.email.data}!',category='success')
-            return redirect(url_for('home'))
+            next_page = request.args.get('next')
+
+            return redirect(next_page) if not None else redirect(url_for('home'))
 
         else:
             flash(f'Invalid email or password',category='danger')
@@ -58,35 +56,35 @@ def login():
 
 
 @app.route('/update',methods=['GET','POST'])
+@login_required
 def DataEntry():
-    if current_user.is_authenticated:
-        form = DataEntryForm()
-        if form.validate_on_submit():
-            
-
-            #get data from forms
-            current = form.current.data
-            total = form.lab_capacity.data
-            ava = total-current #availability
-
-            #get labid for current user
-            lid = current_user.LabID
-            
-            #create update entity
-            update  = Update(LabID=lid,PatientToTest=current,TotalTests=total,Availability=ava)
-            
-            #Add entity to db
-            db.session.add(update)
-            db.session.commit()
-
-            return redirect(url_for('home'))
+    form  = DataEntryForm()
+    if form.validate_on_submit():
         
+
+        #get data from forms
+        current = form.current.data
+        total = form.lab_capacity.data
+        ava = total-current #availability
+
+        #get labid for current user
+        lid = current_user.LabID
         
-        return render_template("Update.html",title='Update data',form=form)
+        #create update entity
+        update  = Update(LabID=lid,PatientToTest=current,TotalTests=total,Availability=ava)
+        
+        #Add entity to db
+        db.session.add(update)
+        db.session.commit()
+
+        return redirect(url_for('home'))
     
-    else:
-        flash(f'Login to continue',category='info')
-    return redirect(url_for('login'))
+    
+    return render_template("Update.html",title='Update data',form=form)
+    
+    #else:
+    #    flash(f'Login to continue',category='info')
+    #return redirect(url_for('login'))
 
 @app.route('/logout')
 def logout():
