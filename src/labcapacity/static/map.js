@@ -1,22 +1,19 @@
-function drawMap() {
-	var labData = fetchData();
-
+function drawMap(labData) {
 	var labDataKeys = Object.keys(labData);
 	console.log(labDataKeys)
-	var scl = [[0,'rgb(5, 10, 172)'],[0.35,'rgb(40, 60, 190)'],[0.5,'rgb(70, 100, 245)'], [0.6,'rgb(90, 120, 245)'],[0.7,'rgb(106, 137, 247)'],[1,'rgb(220, 220, 220)']];
+	var scl = [[0,'rgb(9, 0, 0)'],[0.25,'rgb(118, 22, 22)'],[0.5,'rgb(201, 114, 114)'], [0.65,'rgb(218, 69, 69)'],[0.85,'rgb(249, 61, 61)'],[1,'rgb(225, 0, 0)']];
 
 	var data = [{
 		type : 'scattergeo',
 		mode : 'markers+text',
 		hovertemplate: '<b>Lab Name<b>: %{text}' +
-                        '<br><b>Lab Intake</b>: %{marker.size}<br>' +
-                        '<b>Lab Avalibility</b>: %{marker.color}' + 
+                        '<br><b>Lab Avalibility</b>: %{marker.color}' + 
                         "<extra></extra>",
 		text : labData['Lab_Name'],
 		lon : labData['Lab_Longitude'],
 		lat : labData['Lab_Latitude'],
 		marker : {
-			size : labData['Lab_Intake'],
+			size : 18,
 			opacity: 0.8,
 			reversescale : true,
 			line: {
@@ -65,145 +62,37 @@ function drawMap() {
 		    }
 		};
 
-
 		var mapDiv = document.getElementById('map-Div');
-		var hoverInfo = document.getElementById('hoverinfo');
-		Plotly.newPlot(mapDiv, data, layout)
+		Plotly.newPlot(mapDiv, data, layout, {responsive: true})
 
+		var clickTarget = document.getElementById('clicked-mark-info');
+		mapDiv.on('plotly_click', function(data){
+	    var pts = '';
+
+	    for(var i=0; i < data.points.length; i++){
+
+			keyIndex = labData['Lab_Name'].indexOf(data.points[i].text)
+	        pts = 'Lab Name: '+labData['Lab_Name'][keyIndex] +'<br>Lab Intake '+
+	            labData['Lab_Intake'][keyIndex] + '\n\n';
+	    }
+
+	    if (document.getElementById('clicked-mark-info').innerHTML.toString().trim().includes(pts.toString().trim())){
+	    	document.getElementById('clicked-mark-info').innerHTML = ""
+	    } else {
+	    	document.getElementById('clicked-mark-info').innerHTML = `<div><center><p>${pts}</p></center></div`
+	    }
+	    //alert('Closest point clicked:\n\n'+pts);
+
+	});
 }
 
+function postMetrics(labData) {
+	var metricsDiv = document.getElementById('metrics-Div'); 
 
-/*
-function drawMap () {
-		var data = [{
-		    type: 'scattergeo',
-		    mode: 'markers+text',
-		    text: [
-		        'Lab1', 'Lab2', 'Lab3'
-		    ],
-		    lon: [
-		        -84.55, -83.74, -83.14
-		    ],
-		    lat: [
-		        42.73, 42.28, 42.60
-		    ],
-		    marker: {
-		        size: 7,
-		        color: [
-		            '#bebada', '#fdb462', '#fb8072'
-		        ],
-		        line: {
-		            width: 1
-		        }
-		    },
-		    name: '',
-		    textposition: [
-		        'top right', 'top left', 'top center', 'bottom right', 'top right',
-		        'top left', 'bottom right', 'bottom left', 'top right', 'top right'
-		    ],
-		}];
+	var maxLabAvalilility = Math.max(...labData['Lab_Avalilility']);
+	keyIndex = labData['Lab_Avalilility'].indexOf(maxLabAvalilility);
 
-		var layout = {
-			width: 700,
-        	height: 700,
-		    title: 'Michigan Labs',
-		    font: {
-		        family: 'Droid Serif, serif',
-		        size: 12
-		    },
-		    titlefont: {
-		        size: 16
-		    },
-		    geo: {
-		        scope: 'north america',
-		        resolution: 50,
-		        lonaxis: {
-		            'range': [-90, -80]
-		        },
-		        lataxis: {
-		            'range': [40, 48]
-		        },
-		        showrivers: true,
-		        rivercolor: '#fff',
-		        showlakes: true,
-		        lakecolor: '#fff',
-		        showland: true,
-		        landcolor: '#EAEAAE',
-		        countrycolor: '#d3d3d3',
-		        countrywidth: 1.5,
-		        subunitcolor: '#d3d3d3'
-		    }
-		};
+	console.log(keyIndex)
 
-		var mapDiv = document.getElementById('map-Div');
-		Plotly.newPlot(mapDiv, data, layout)
-
-	}
-
-
-window.onload = function() {
-		var data = [{
-		    type: 'scattergeo',
-		    mode: 'markers+text',
-		    text: [
-		        'Lab1', 'Lab2', 'Lab3'
-		    ],
-		    lon: [
-		        -84.55, -83.74, -83.14
-		    ],
-		    lat: [
-		        42.73, 42.28, 42.60
-		    ],
-		    marker: {
-		        size: 7,
-		        color: [
-		            '#bebada', '#fdb462', '#fb8072'
-		        ],
-		        line: {
-		            width: 1
-		        }
-		    },
-		    name: '',
-		    textposition: [
-		        'top right', 'top left', 'top center', 'bottom right', 'top right',
-		        'top left', 'bottom right', 'bottom left', 'top right', 'top right'
-		    ],
-		}];
-
-		var layout = {
-			width: 700,
-        	height: 700,
-		    title: 'Michigan Labs',
-		    font: {
-		        family: 'Droid Serif, serif',
-		        size: 12
-		    },
-		    titlefont: {
-		        size: 16
-		    },
-		    geo: {
-		        scope: 'north america',
-		        resolution: 50,
-		        lonaxis: {
-		            'range': [-90, -80]
-		        },
-		        lataxis: {
-		            'range': [40, 48]
-		        },
-		        showrivers: true,
-		        rivercolor: '#fff',
-		        showlakes: true,
-		        lakecolor: '#fff',
-		        showland: true,
-		        landcolor: '#EAEAAE',
-		        countrycolor: '#d3d3d3',
-		        countrywidth: 1.5,
-		        subunitcolor: '#d3d3d3'
-		    }
-		};
-
-		var mapDiv = document.getElementById('map-Div');
-		Plotly.newPlot(mapDiv, data, layout)
-
-	}
-*/
+	metricsDiv.innerHTML = `<center><p><b>Max Avalibility:</b> ${maxLabAvalilility} &nbsp; <b>Lab Name:</b> ${labData['Lab_Name'][keyIndex]}</p></center>`
+}

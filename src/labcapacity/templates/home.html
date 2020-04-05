@@ -1,6 +1,9 @@
 {% extends "layout.html" %}
 {% block content %}
-    <h1>Dashboard goes here</h1>
+
+	<div id="metrics-Div">
+		
+	</div>
 
     <div id="map-Div">
     	
@@ -8,7 +11,6 @@
 
     </div>
 
-    <div id="hoverinfo" style="margin-left:80px;"></div>
 
 {% endblock content %}
 
@@ -16,9 +18,10 @@
 <script src="{{ url_for('static', filename='dataFetch.js') }}"></script>
 <script src="{{ url_for('static', filename='map.js') }}"></script>
 <script type="text/javascript">
-		window.onload = function() {
-		drawMap();
-		console.log('ran')
+	window.onload = function() {
+		var labData = fetchData();
+		drawMap(labData);
+		postMetrics(labData);
 	};
 </script>
 
