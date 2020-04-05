@@ -18,7 +18,7 @@ bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 login_manager.login_message_category='info'
-geolocator = Nominatim(user_agent='labcapacity-19')
+geolocator = Nominatim(user_agent='labcapacity-covid-19')
 
 
 

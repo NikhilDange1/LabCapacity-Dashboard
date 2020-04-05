@@ -8,14 +8,17 @@
         <table class="table">
             <tr>
                 <th>Lab</th>
+                <th>City</th>
                 <th>Availability</th>
                 <th>last update</th>
             </tr>
-            {% for i in latest  %}
+            {% for i in range(latest | length)  %}
+            <!-- latest = list of (LabID,Name,City,Lat,Long,Availability,Timestamp)) for every lab  !-->
             <tr>
-                <th>{{ i[1] }}</th>
-                <th>{{ i[2] }}</th>
-                <th>{{ i[3] }}</th>
+                <th>{{ latest[i][1] }}</th>
+                <th>{{ latest[i][2] }}</th>
+                <th>{{ latest[i][5] }}</th>
+                <th>{{ delta[i] }}</th>
             </tr>
             
             {% endfor %}
