@@ -1,4 +1,24 @@
 {% extends "layout.html" %}
 {% block content %}
     <h1>Dashboard goes here</h1>
+    <div>
+        {{map | safe }}
+    </div>
+    <div>
+        <table class="table">
+            <tr>
+                <th>Lab</th>
+                <th>Availability</th>
+                <th>last update</th>
+            </tr>
+            {% for i in latest  %}
+            <tr>
+                <th>{{ i[1] }}</th>
+                <th>{{ i[2] }}</th>
+                <th>{{ i[3] }}</th>
+            </tr>
+            
+            {% endfor %}
+        </table>
+    </div>
 {% endblock content %}

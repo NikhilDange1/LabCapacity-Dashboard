@@ -3,6 +3,7 @@ from labcapacity.forms import RegistrationForm,LoginForm,DataEntryForm
 from labcapacity.models import Users, Labs, Update
 from labcapacity import app, db, bcrypt, geolocator
 from flask_login import login_user, current_user, logout_user, login_required
+import folium
 
 def get_coord(street,city,state,zipcode):
     
@@ -17,10 +18,35 @@ def get_coord(street,city,state,zipcode):
 
     return location.latitude , location.longitude
 
+
+def get_latest_table():
+    labs = Labs()
+    l = Update.query.with_entities(Update.LabID,Labs.Name,Update.Availability,db.func.max(Update.Timestamp)).group_by(Update.LabID).join(Update.lab).all()
+    return l
+
+
+def add_labs(folium_map):
+
+    labs = Labs.query.with_entities(Labs.Name,Labs.Lat, Labs.Long).all()
+    for i in labs:
+        loc = (i[1],i[2])
+        folium.Marker(location=loc,tooltip='<strong>{}</strong>'.format(i[0])).add_to(folium_map)
+        folium.vector_layers.CircleMarker(location=loc,radius=30,tooltip='<strong>Labs</strong>').add_to(folium_map)
+
+    return folium_map
+
+
 @app.route("/")
 @app.route("/home")
 def home():
-    return render_template('home.html')
+    start_coords = (42.7325, -84.555)
+    folium_map = folium.Map(location=start_coords, zoom_start=8,tiles='Stamen  Toner')#
+
+    folium_map = add_labs(folium_map)
+
+    latest = get_latest_table()
+    
+    return render_template('home.html',map=folium_map._repr_html_(),latest=latest)
 
 
 @app.route("/register",methods=['GET','POST'])
